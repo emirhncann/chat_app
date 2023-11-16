@@ -42,10 +42,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Diğer widget'larınızı ekleyin
             ElevatedButton(
               onPressed: () {
-                // Butona tıklandığında chat_screen.dart ekranına geçiş yapın
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ChatScreen()),

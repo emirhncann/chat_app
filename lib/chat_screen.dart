@@ -1,3 +1,5 @@
+import 'package:chat_app_flutter/CustomUI/OwnMessageCard.dart';
+import 'package:chat_app_flutter/CustomUI/ReplyCard.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -13,7 +15,27 @@ class ChatScreen extends StatelessWidget {
         color: Colors.blueGrey,
         child: Stack(
           children: [
-            ListView(),
+            Container(
+              height: MediaQuery.of(context).size.height - 140,
+              child: ListView(
+                children: [
+                  OwnMessageCard(),
+                  ReplyCard(),
+                  OwnMessageCard(),
+                  ReplyCard(),
+                  OwnMessageCard(),
+                  ReplyCard(),
+                  OwnMessageCard(),
+                  ReplyCard(),
+                  ReplyCard(),
+                  OwnMessageCard(),
+                  ReplyCard(),
+                  OwnMessageCard(),
+                  ReplyCard(),
+                  OwnMessageCard(),
+                ],
+              ),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Row(
