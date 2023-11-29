@@ -1,8 +1,20 @@
 import 'package:chat_app_flutter/CustomUI/OwnMessageCard.dart';
 import 'package:chat_app_flutter/CustomUI/ReplyCard.dart';
 import 'package:flutter/material.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  IO.Socket socket;
+
+  void connect() {
+    socket = IO.io(uri);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
