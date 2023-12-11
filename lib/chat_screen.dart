@@ -1,12 +1,18 @@
 import 'package:chat_app_flutter/CustomUI/OwnMessageCard.dart';
 import 'package:chat_app_flutter/CustomUI/ReplyCard.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatScreen extends StatefulWidget {
+  final String name;
+  const ChatScreen({super.key, required this.name});
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
+
+TextEditingController _messageController = TextEditingController();
 
 class _ChatScreenState extends State<ChatScreen> {
   late IO.Socket socket;
@@ -25,8 +31,18 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  void mesaj() {
+    socket!.emit("test", {
+      "type": "ownMsg",
+      "name": widget.name,
+      "msg": "_messageController",
+      "senderName":
+          "senderName", // You need to define senderName or pass it as a parameter
+    });
+  }
+
   void connect() {
-    socket = IO.io("http://192.168.2.120:3000", <String, dynamic>{
+    socket = IO.io("http://192.168.56.1:7162", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
     });
@@ -34,6 +50,51 @@ class _ChatScreenState extends State<ChatScreen> {
     socket.onConnect((data) => print("connected"));
     print(socket.connected);
     socket.emit("/test", "hello world");
+    final Map<String, dynamic> jsonData = {
+      "type": "ownMsg",
+      "name": "John Doe",
+      "msg": "Hello, server!",
+      "senderName": "John",
+    };
+  }
+
+  void sendJsonToServer(String a) async {
+    final Map<String, dynamic> jsonData = {
+      "type": "ownMsg",
+      "name": "John Doe",
+      "msg": a,
+      "senderName": "John",
+    };
+
+    final String serverUrl =
+        "http://192.168.56.1:7162/test"; // Sunucu URL'sini buraya ekleyin
+
+    try {
+      final response = await http.post(
+        Uri.parse(serverUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(jsonData),
+      );
+
+      if (response.statusCode == 200) {
+        print("Server Response: ${response.body}");
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Exception: $e");
+    }
+  }
+
+  void sendMsg(String msg, String senderName) {
+    socket!.emit("/test", {
+      "type": "ownMsg",
+      "name": widget.name,
+      "msg": _messageController.text,
+      "senderName": senderName,
+    });
   }
 
   @override
@@ -82,6 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextFormField(
+                          controller: _messageController,
                           textAlignVertical: TextAlignVertical.center,
                           keyboardType: TextInputType.multiline,
                           maxLines: 5,
@@ -98,7 +160,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     backgroundColor: Colors.white,
                     child: IconButton(
                       icon: Icon(Icons.send),
-                      onPressed: () {},
+                      onPressed: () {
+                        sendJsonToServer(_messageController.text);
+                        _messageController.clear();
+                      },
                     ),
                   ),
                 ],

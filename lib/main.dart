@@ -46,7 +46,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ChatScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                            name: "emir",
+                          )),
                 );
               },
               child: Text('Go to Chat Screen'),
