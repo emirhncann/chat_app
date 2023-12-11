@@ -1,3 +1,4 @@
+import 'package:chat_app_flutter/CustomUI/SignUp.dart';
 import 'package:flutter/material.dart';
 import 'chat_screen.dart'; // chat_screen.dart dosyasını ekleyin
 
@@ -53,6 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: Text('Go to Chat Screen'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignUpScreen()),
+                );
+              },
+              child: Text('sign Up'),
             ),
           ],
         ),
