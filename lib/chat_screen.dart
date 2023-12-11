@@ -9,10 +9,31 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  IO.Socket socket;
+  late IO.Socket socket;
+  FocusNode focusNode = FocusNode();
+  bool show = false;
+  @override
+  void initState() {
+    super.initState();
+    connect();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        setState(() {
+          show = false;
+        });
+      }
+    });
+  }
 
   void connect() {
-    socket = IO.io(uri);
+    socket = IO.io("http://192.168.2.120:3000", <String, dynamic>{
+      "transports": ["websocket"],
+      "autoConnect": false,
+    });
+    socket.connect();
+    socket.onConnect((data) => print("connected"));
+    print(socket.connected);
+    socket.emit("/test", "hello world");
   }
 
   @override
