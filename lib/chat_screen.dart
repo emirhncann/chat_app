@@ -7,32 +7,29 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatScreen extends StatefulWidget {
   final String name;
-  const ChatScreen(
-      {super.key,
-      required this.name,
-      required String phone,
-      required String lastname});
+  final String phone;
+  final String lastname;
+
+  ChatScreen({
+    Key? key,
+    required this.name,
+    required this.phone,
+    required this.lastname,
+  }) : super(key: key);
+
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-TextEditingController _messageController = TextEditingController();
-
 class _ChatScreenState extends State<ChatScreen> {
   late IO.Socket socket;
-  FocusNode focusNode = FocusNode();
-  bool show = false;
+  TextEditingController _messageController = TextEditingController();
+  List<Map<String, dynamic>> messages = [];
+
   @override
   void initState() {
     super.initState();
     connect();
-    focusNode.addListener(() {
-      if (focusNode.hasFocus) {
-        setState(() {
-          show = false;
-        });
-      }
-    });
   }
 
   void connect() {
@@ -44,18 +41,40 @@ class _ChatScreenState extends State<ChatScreen> {
     socket.onConnect((data) => print("connected"));
     print(socket.connected);
     socket.emit("/test", "hello world");
+    socket.on("/test", (data) {
+      setState(() {
+        messages.add(data);
+        buildMessageList(_messageController.text);
+      });
+    });
+  }
+
+  Widget buildMessageList(String newText) {
+    return ListView.builder(
+      itemCount: messages.length,
+      itemBuilder: (context, index) {
+        final message = messages[index];
+        final String messageType = message['type'] ?? '';
+
+        if (message['id'] == widget.phone) {
+          print("1");
+          return OwnMessageCard(message['msg']);
+        } else {
+          print("2");
+          return ReplyCard(message['msg']);
+        }
+      },
+    );
   }
 
   void sendJsonToServer(String msg) async {
     final Map<String, dynamic> jsonData = {
-      "type": "ownMsg",
-      "name": "John Doe",
+      "phone": widget.phone,
+      "name": widget.name + " " + widget.lastname,
       "msg": msg,
-      "senderName": "John",
     };
 
-    final String serverUrl =
-        "http://192.168.56.1:3001/test"; // Sunucu URL'sini buraya ekleyin
+    final String serverUrl = "http://192.168.56.1:3001/test";
 
     try {
       final response = await http.post(
@@ -68,21 +87,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
       if (response.statusCode == 200) {
         print("Server Response: ${response.body}");
+
+        setState(() {
+          messages.add(json.decode(response.body));
+          buildMessageList(_messageController.text);
+        });
       } else {
         print("Error: ${response.statusCode}");
       }
     } catch (e) {
       print("Exception: $e");
     }
-  }
-
-  void sendMsg(String msg, String senderName) {
-    socket!.emit("/test", {
-      "type": "ownMsg",
-      "name": widget.name,
-      "msg": _messageController.text,
-      "senderName": senderName,
-    });
   }
 
   @override
@@ -99,24 +114,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Container(
               height: MediaQuery.of(context).size.height - 140,
-              child: ListView(
-                children: [
-                  OwnMessageCard(),
-                  ReplyCard(),
-                  OwnMessageCard(),
-                  ReplyCard(),
-                  OwnMessageCard(),
-                  ReplyCard(),
-                  OwnMessageCard(),
-                  ReplyCard(),
-                  ReplyCard(),
-                  OwnMessageCard(),
-                  ReplyCard(),
-                  OwnMessageCard(),
-                  ReplyCard(),
-                  OwnMessageCard(),
-                ],
-              ),
+              child: buildMessageList(_messageController.text),
             ),
             Align(
               alignment: Alignment.bottomCenter,

@@ -1,5 +1,5 @@
-import 'package:chat_app_flutter/chat_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:chat_app_flutter/chat_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -36,12 +36,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             TextField(
               controller: _phoneNumberController,
               decoration: InputDecoration(labelText: 'Phone Number'),
-              enabled: true, // Kullanıcının silebilmesini engellemek için
+              enabled: true, // Allowing the user to edit the phone number
             ),
             SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
-                // Burada kullanıcının girdiği bilgileri kullanabilirsiniz
                 String firstName = _firstNameController.text;
                 String lastName = _lastNameController.text;
                 String phoneNumber = _phoneNumberController.text;
@@ -49,11 +48,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                            name: "$firstName",
-                            lastname: "$lastName",
-                            phone: "$phoneNumber",
-                          )),
+                    builder: (context) => ChatScreen(
+                      name: "$firstName",
+                      lastname: "$lastName",
+                      phone: "$phoneNumber",
+                    ),
+                  ),
                 );
               },
               child: Text('Sign Up'),
