@@ -36,7 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void connect() {
-    socket = IO.io("http://192.168.56.1:7162", <String, dynamic>{
+    socket = IO.io("http://192.168.56.1:3001", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": false,
     });
@@ -44,12 +44,6 @@ class _ChatScreenState extends State<ChatScreen> {
     socket.onConnect((data) => print("connected"));
     print(socket.connected);
     socket.emit("/test", "hello world");
-    final Map<String, dynamic> jsonData = {
-      "type": "ownMsg",
-      "name": "Emir",
-      "msg": "Hello, server!",
-      "senderName": "emiiir",
-    };
   }
 
   void sendJsonToServer(String msg) async {
@@ -61,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
     };
 
     final String serverUrl =
-        "http://192.168.56.1:7162/test"; // Sunucu URL'sini buraya ekleyin
+        "http://192.168.56.1:3001/test"; // Sunucu URL'sini buraya ekleyin
 
     try {
       final response = await http.post(
