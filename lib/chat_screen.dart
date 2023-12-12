@@ -7,7 +7,11 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatScreen extends StatefulWidget {
   final String name;
-  const ChatScreen({super.key, required this.name});
+  const ChatScreen(
+      {super.key,
+      required this.name,
+      required String phone,
+      required String lastname});
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -31,16 +35,6 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void mesaj() {
-    socket!.emit("test", {
-      "type": "ownMsg",
-      "name": widget.name,
-      "msg": "_messageController",
-      "senderName":
-          "senderName", // You need to define senderName or pass it as a parameter
-    });
-  }
-
   void connect() {
     socket = IO.io("http://192.168.56.1:7162", <String, dynamic>{
       "transports": ["websocket"],
@@ -52,17 +46,17 @@ class _ChatScreenState extends State<ChatScreen> {
     socket.emit("/test", "hello world");
     final Map<String, dynamic> jsonData = {
       "type": "ownMsg",
-      "name": "John Doe",
+      "name": "Emir",
       "msg": "Hello, server!",
-      "senderName": "John",
+      "senderName": "emiiir",
     };
   }
 
-  void sendJsonToServer(String a) async {
+  void sendJsonToServer(String msg) async {
     final Map<String, dynamic> jsonData = {
       "type": "ownMsg",
       "name": "John Doe",
-      "msg": a,
+      "msg": msg,
       "senderName": "John",
     };
 
