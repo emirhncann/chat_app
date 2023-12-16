@@ -7,7 +7,7 @@ class OwnMessageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("ReplyCard message: $message");
+    print("Own message: $message");
     return Align(
       alignment: Alignment.centerRight,
       child: ConstrainedBox(
