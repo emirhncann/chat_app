@@ -1,62 +1,98 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:chat_app_flutter/chat_screen.dart';
 
-class SignUpScreen extends StatefulWidget {
+class RegisterScreen extends StatefulWidget {
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController _firstNameController = TextEditingController();
-  TextEditingController _lastNameController = TextEditingController();
-  TextEditingController _phoneNumberController =
-      TextEditingController(text: '+90');
+class _RegisterScreenState extends State<RegisterScreen> {
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _confirmPasswordController = TextEditingController();
+
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up'),
+        title: Text('Kayıt Ol'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: _firstNameController,
-              decoration: InputDecoration(labelText: 'First Name'),
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Ad Soyad',
+              ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 16.0),
             TextField(
-              controller: _lastNameController,
-              decoration: InputDecoration(labelText: 'Last Name'),
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'E-posta',
+              ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 16.0),
             TextField(
-              controller: _phoneNumberController,
-              decoration: InputDecoration(labelText: 'Phone Number'),
-              enabled: true, // Allowing the user to edit the phone number
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: 'Telefon Numarası',
+              ),
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 16.0),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Şifre',
+              ),
+            ),
+            SizedBox(height: 16.0),
+            TextField(
+              controller: _confirmPasswordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Şifre Tekrar',
+              ),
+            ),
+            SizedBox(height: 32.0),
             ElevatedButton(
-              onPressed: () {
-                String firstName = _firstNameController.text;
-                String lastName = _lastNameController.text;
-                String phoneNumber = _phoneNumberController.text;
+              onPressed: () async {
+                String name = _nameController.text;
+                String email = _emailController.text;
+                String phone = _phoneController.text;
+                String password = _passwordController.text;
+                String confirmPassword = _confirmPasswordController.text;
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatScreen(
-                      name: "$firstName",
-                      lastname: "$lastName",
-                      phone: "$phoneNumber",
-                    ),
-                  ),
-                );
+                if (password == confirmPassword) {
+                  try {
+                    UserCredential userCredential =
+                        await _auth.createUserWithEmailAndPassword(
+                      email: email,
+                      password: password,
+                    );
+
+                    // Kullanıcı oluşturuldu
+                    print('Kullanıcı oluşturuldu: ${userCredential.user!.uid}');
+                  } catch (e) {
+                    // Hata durumu
+                    print('Hata: $e');
+                  }
+                } else {
+                  // Şifreler eşleşmiyor
+                  print('Şifreler eşleşmiyor');
+                }
               },
-              child: Text('Sign Up'),
+              child: Text('Kayıt Ol'),
             ),
           ],
         ),
