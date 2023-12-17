@@ -125,7 +125,7 @@ class ChatScreen extends StatefulWidget {
     required this.chatDocumentId,
     required this.userName,
     required this.userSurname,
-    required this.userEmail,
+    required this.userEmail, required String otherUserEmail, required otherUserName, required otherUserSurname,
   }) : super(key: key);
 
   @override
@@ -134,6 +134,7 @@ class ChatScreen extends StatefulWidget {
 
 var currentUser = FirebaseAuth.instance.currentUser;
 var myEmail = currentUser?.email;
+
 
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _messageController = TextEditingController();

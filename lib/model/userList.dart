@@ -60,6 +60,9 @@ class UserList extends StatelessWidget {
                           userName: userName,
                           userSurname: userSurname,
                           userEmail: userEmail,
+                          otherUserEmail: '',
+                          otherUserName: "",
+                          otherUserSurname: "",
                         ),
                       ),
                     );
@@ -81,6 +84,9 @@ class UserList extends StatelessWidget {
                           userName: userName,
                           userSurname: userSurname,
                           userEmail: userEmail,
+                          otherUserEmail: '',
+                          otherUserName: "",
+                          otherUserSurname: "",
                         ),
                       ),
                     );
@@ -97,7 +103,7 @@ class UserList extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '$userName $userSurname',
+                              '$userEmail',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 5),
