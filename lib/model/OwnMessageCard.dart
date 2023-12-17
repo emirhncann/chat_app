@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class OwnMessageCard extends StatelessWidget {
   final String message;
-  final String? timestamp; 
+  final String? timestamp;
 
   OwnMessageCard(this.message, {required this.timestamp});
 
