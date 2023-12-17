@@ -30,29 +30,61 @@ class UserList extends StatelessWidget {
               InkWell(
                 onTap: () async {
                   var otherUserEmail = userEmail;
-                  var chatDocumentId = '$myEmail;$otherUserEmail';
+                  var currentUserEmail =
+                      FirebaseAuth.instance.currentUser?.email;
+                  var chatCollection =
+                      FirebaseFirestore.instance.collection('sohbetler');
 
-                  var chatDocument = FirebaseFirestore.instance
-                      .collection('sohbetler')
-                      .doc(chatDocumentId);
+                  // Check if a chat already exists with these participants
+                  var existingChat = await chatCollection
+                      .where('from', isEqualTo: currentUserEmail)
+                      .where('to', isEqualTo: otherUserEmail)
+                      .get();
 
-                  if (!(await chatDocument.get()).exists) {
-                    await chatDocument.set({
-                      'participants': [myEmail, otherUserEmail],
-                      'created_at': FieldValue.serverTimestamp(),
-                      "userName": userName,
-                      "userSurname": userSurname,
-                    });
+                  if (existingChat.docs.isEmpty) {
+                    // Check the reverse scenario
+                    existingChat = await chatCollection
+                        .where('from', isEqualTo: otherUserEmail)
+                        .where('to', isEqualTo: currentUserEmail)
+                        .get();
                   }
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        chatDocumentId: chatDocumentId,
+                  if (existingChat.docs.isNotEmpty) {
+                    var chatDocumentId = existingChat.docs.first.id;
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          chatDocumentId: chatDocumentId,
+                          userName: userName,
+                          userSurname: userSurname,
+                          userEmail: userEmail,
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  } else {
+                    // If no existing chat, create a new one
+                    var newChatDocument = await chatCollection.add({
+                      'from': currentUserEmail,
+                      'to': otherUserEmail,
+                      'tarih': Timestamp.now(),
+                    });
+
+                    var chatDocumentId = newChatDocument.id;
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          chatDocumentId: chatDocumentId,
+                          userName: userName,
+                          userSurname: userSurname,
+                          userEmail: userEmail,
+                        ),
+                      ),
+                    );
+                  }
                 },
                 child: Card(
                   margin: const EdgeInsets.all(8),
