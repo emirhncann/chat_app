@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -7,13 +8,52 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _phoneController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  Future<void> registerUser() async {
+    try {
+      FirebaseAuth auth = FirebaseAuth.instance;
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+      String email = _emailController.text;
+      String password = _passwordController.text;
+
+      // Firebase kimlik doğrulama işlemi
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Oluşturulan kullanıcının UID'sini al
+      String userId = userCredential.user?.uid ?? '';
+
+      // Firestore'a kullanıcı bilgilerini ekle
+      await firestore.collection('kullanicilar').doc(userId).set({
+        'name': _nameController.text,
+        'surname': _surnameController.text,
+        'email': email,
+        'phone': _phoneController.text,
+      });
+
+      print('Kullanıcı başarıyla kaydedildi: $userId');
+
+      // Kullanıcı kaydı başarılıysa ChatScreen'e geçiş yap
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatScreen(),
+        ),
+      );
+    } catch (e) {
+      print('Kullanıcı kaydetme hatası: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +69,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: 'Ad Soyad',
+                labelText: 'Ad',
+              ),
+            ),
+            SizedBox(height: 16.0),
+            TextField(
+              controller: _surnameController,
+              decoration: InputDecoration(
+                labelText: 'Soyad',
               ),
             ),
             SizedBox(height: 16.0),
@@ -67,35 +114,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 32.0),
             ElevatedButton(
               onPressed: () async {
-                String name = _nameController.text;
-                String email = _emailController.text;
-                String phone = _phoneController.text;
-                String password = _passwordController.text;
-                String confirmPassword = _confirmPasswordController.text;
-
-                if (password == confirmPassword) {
-                  try {
-                    UserCredential userCredential =
-                        await _auth.createUserWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-
-                    // Kullanıcı oluşturuldu
-                    print('Kullanıcı oluşturuldu: ${userCredential.user!.uid}');
-                  } catch (e) {
-                    // Hata durumu
-                    print('Hata: $e');
-                  }
-                } else {
-                  // Şifreler eşleşmiyor
-                  print('Şifreler eşleşmiyor');
-                }
+                // Firebase kimlik doğrulama işlemi buraya eklenmeli
+                await registerUser();
               },
               child: Text('Kayıt Ol'),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ChatScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat Screen'),
+      ),
+      body: Center(
+        child: Text('Chat Screen'),
       ),
     );
   }

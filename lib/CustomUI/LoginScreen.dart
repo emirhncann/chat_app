@@ -1,4 +1,5 @@
 import 'package:chat_app_flutter/CustomUI/SignUp.dart';
+import 'package:chat_app_flutter/CustomUI/home.dart';
 import 'package:chat_app_flutter/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,6 +56,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Giriş başarılı
                   print('Giriş başarılı: ${userCredential.user!.uid}');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => home(),
+                    ),
+                  );
                 } catch (e) {
                   // Giriş başarısız
                   print('Giriş başarısız: $e');
@@ -68,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChatScreen(),
+                    builder: (context) => home(),
                   ),
                 );
               },
