@@ -35,14 +35,12 @@ class UserList extends StatelessWidget {
                   var chatCollection =
                       FirebaseFirestore.instance.collection('sohbetler');
 
-                  // Check if a chat already exists with these participants
                   var existingChat = await chatCollection
                       .where('from', isEqualTo: currentUserEmail)
                       .where('to', isEqualTo: otherUserEmail)
                       .get();
 
                   if (existingChat.docs.isEmpty) {
-                    // Check the reverse scenario
                     existingChat = await chatCollection
                         .where('from', isEqualTo: otherUserEmail)
                         .where('to', isEqualTo: currentUserEmail)
@@ -67,7 +65,6 @@ class UserList extends StatelessWidget {
                       ),
                     );
                   } else {
-                    // If no existing chat, create a new one
                     var newChatDocument = await chatCollection.add({
                       'from': currentUserEmail,
                       'to': otherUserEmail,

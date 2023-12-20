@@ -44,42 +44,38 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBrTXkhMmScm_FSbo_8m6mewIwNA8gsGZ8',
-    appId: '1:42799207797:web:5ce8b70c18bd1b7f88ef3c',
-    messagingSenderId: '42799207797',
-    projectId: 'chat-app-bsm',
-    authDomain: 'chat-app-bsm.firebaseapp.com',
-    databaseURL: 'https://chat-app-bsm-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'chat-app-bsm.appspot.com',
-    measurementId: 'G-8KCK5Q930P',
+    apiKey: 'AIzaSyAhkxAfL66iLfNBaYhaYT03Q7Ux98ZL5yQ',
+    appId: '1:568380153576:web:b2b8df190452f76d0c335d',
+    messagingSenderId: '568380153576',
+    projectId: 'chat-app-btbs',
+    authDomain: 'chat-app-btbs.firebaseapp.com',
+    storageBucket: 'chat-app-btbs.appspot.com',
+    measurementId: 'G-XRLXNN5T5X',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyACv3VuwF-KcITEKfY5XfHlm9utCbRsVYI',
-    appId: '1:42799207797:android:9d63e05d467a6b9588ef3c',
-    messagingSenderId: '42799207797',
-    projectId: 'chat-app-bsm',
-    databaseURL: 'https://chat-app-bsm-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'chat-app-bsm.appspot.com',
+    apiKey: 'AIzaSyAle_QoSIFEJA0dqof9zGXV_6Yld62azAI',
+    appId: '1:568380153576:android:61342f95b28847f60c335d',
+    messagingSenderId: '568380153576',
+    projectId: 'chat-app-btbs',
+    storageBucket: 'chat-app-btbs.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCLPsadK_gyI0HtYunNCV2TAx821YMCsKY',
-    appId: '1:42799207797:ios:7cb1833ac3ede35688ef3c',
-    messagingSenderId: '42799207797',
-    projectId: 'chat-app-bsm',
-    databaseURL: 'https://chat-app-bsm-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'chat-app-bsm.appspot.com',
+    apiKey: 'AIzaSyA80lnkunsdLzvPyqwPW3wtoJh8NWAwbgs',
+    appId: '1:568380153576:ios:45e49387f3a4b75b0c335d',
+    messagingSenderId: '568380153576',
+    projectId: 'chat-app-btbs',
+    storageBucket: 'chat-app-btbs.appspot.com',
     iosBundleId: 'com.example.chatAppFlutter',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCLPsadK_gyI0HtYunNCV2TAx821YMCsKY',
-    appId: '1:42799207797:ios:28863ae6153c541588ef3c',
-    messagingSenderId: '42799207797',
-    projectId: 'chat-app-bsm',
-    databaseURL: 'https://chat-app-bsm-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'chat-app-bsm.appspot.com',
+    apiKey: 'AIzaSyA80lnkunsdLzvPyqwPW3wtoJh8NWAwbgs',
+    appId: '1:568380153576:ios:28f1b9d7f78725ae0c335d',
+    messagingSenderId: '568380153576',
+    projectId: 'chat-app-btbs',
+    storageBucket: 'chat-app-btbs.appspot.com',
     iosBundleId: 'com.example.chatAppFlutter.RunnerTests',
   );
 }

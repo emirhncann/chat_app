@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     password: password,
                   );
 
-                  // Giriş başarılı
+                  
                   print('Giriş başarılı: ${userCredential.user!.uid}');
                   Navigator.pushReplacement(
                     context,
@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   );
                 } catch (e) {
-                  // Giriş başarısız
+                  
                   print('Giriş başarısız: $e');
                 }
               },

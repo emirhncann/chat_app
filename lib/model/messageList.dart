@@ -30,8 +30,6 @@ class MessageList extends StatelessWidget {
               return CircularProgressIndicator();
             }
 
-            // Buraya kadar geldiysek, her iki sorgu da veri içeriyor demektir.
-            // Şimdi iki sorgunun sonuçlarını birleştiriyoruz.
             List<QueryDocumentSnapshot> messagesFrom = snapshotFrom.data!.docs;
             List<QueryDocumentSnapshot> messagesTo = snapshotTo.data!.docs;
             List<QueryDocumentSnapshot> allMessages = [
@@ -70,14 +68,12 @@ class MessageList extends StatelessWidget {
                         var chatCollection =
                             FirebaseFirestore.instance.collection('sohbetler');
 
-                        // Check if a chat already exists with these participants
                         var existingChat = await chatCollection
                             .where('from', isEqualTo: currentUserEmail)
                             .where('to', isEqualTo: otherUserEmail)
                             .get();
 
                         if (existingChat.docs.isEmpty) {
-                          // Check the reverse scenario
                           existingChat = await chatCollection
                               .where('from', isEqualTo: otherUserEmail)
                               .where('to', isEqualTo: currentUserEmail)
@@ -102,7 +98,6 @@ class MessageList extends StatelessWidget {
                             ),
                           );
                         } else {
-                          // If no existing chat, create a new one
                           var newChatDocument = await chatCollection.add({
                             'from': currentUserEmail,
                             'to': otherUserEmail,
@@ -130,7 +125,6 @@ class MessageList extends StatelessWidget {
                       child: Card(
                         child: ListTile(
                           title: Text(otherUserEmail),
-                          // Add more UI components as needed
                         ),
                       ),
                     );

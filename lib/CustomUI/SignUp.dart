@@ -25,16 +25,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       String email = _emailController.text;
       String password = _passwordController.text;
 
-      // Firebase kimlik doğrulama işlemi
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Oluşturulan kullanıcının UID'sini al
       String userId = userCredential.user?.uid ?? '';
 
-      // Firestore'a kullanıcı bilgilerini ekle
       await firestore.collection('kullanicilar').doc(userId).set({
         'name': _nameController.text,
         'surname': _surnameController.text,
@@ -44,7 +41,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       print('Kullanıcı başarıyla kaydedildi: $userId');
 
-      // Kullanıcı kaydı başarılıysa ChatScreen'e geçiş yap
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -115,7 +111,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 32.0),
             ElevatedButton(
               onPressed: () async {
-                // Firebase kimlik doğrulama işlemi buraya eklenmeli
                 await registerUser();
               },
               child: Text('Kayıt Ol'),
