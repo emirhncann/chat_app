@@ -30,11 +30,13 @@ class _HomeState extends State<Home> {
       backgroundColor: Color(0xFFF2F2F2),
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: Color(0xFF285059),
         title: Center(
           child: Text(
             "Projenin Adı",
             style: TextStyle(
               fontSize: 20,
+              color: Colors.white60,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -57,6 +59,7 @@ class _HomeState extends State<Home> {
         ],
       ),
       bottomNavigationBar: CurvedNavigationBar(
+        height: 60,
         backgroundColor: Color(0xF2F2F2),
         color: Color(0xFF285059),
         animationDuration: Duration(milliseconds: 300),

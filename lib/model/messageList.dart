@@ -121,7 +121,6 @@ class MessageList extends StatelessWidget {
                           );
                         }
                       },
-                      //Card Düzenlenecek
                       child: Container(
                           margin: EdgeInsets.symmetric(
                               vertical: 0.8), // Add top and bottom spacing
