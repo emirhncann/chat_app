@@ -167,18 +167,19 @@ class MessageList extends StatelessWidget {
                                         Text(
                                           otherUserEmail,
                                           style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize:
-                                                13.0, // Set email text size to 20
-                                          ),
+                                              color: Colors.black,
+                                              fontSize: 13.0,
+                                              fontWeight: FontWeight.w300),
                                         ),
                                         Text(
-                                          "Additional Text",
-                                          style: GoogleFonts.lobster(
-                                            color: Colors.black,
-                                            fontSize: 17.0,
-                                            // Set additional text size to 25
-                                          ),
+                                          "$otherUserName"
+                                          " $otherUserSurname",
+                                          style: GoogleFonts.heebo(
+                                              color: Colors.black87,
+                                              fontSize: 17.0,
+                                              fontWeight: FontWeight.w400
+                                              // Set additional text size to 25
+                                              ),
                                         ),
                                       ],
                                     ),
