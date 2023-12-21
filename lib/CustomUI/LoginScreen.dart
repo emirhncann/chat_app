@@ -1,6 +1,6 @@
 import 'package:chat_app_flutter/CustomUI/SignUp.dart';
 import 'package:chat_app_flutter/CustomUI/home.dart';
-import 'package:chat_app_flutter/chat_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -54,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     password: password,
                   );
 
-                  
                   print('Giriş başarılı: ${userCredential.user!.uid}');
                   Navigator.pushReplacement(
                     context,
@@ -63,7 +62,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   );
                 } catch (e) {
-                  
                   print('Giriş başarısız: $e');
                 }
               },

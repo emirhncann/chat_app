@@ -1,7 +1,7 @@
-import 'package:chat_app_flutter/model/userList.dart';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:chat_app_flutter/model/messageList.dart';
+
 
 class home extends StatelessWidget {
   const home({Key? key});
@@ -27,8 +27,8 @@ class home extends StatelessWidget {
           ),
           body: TabBarView(
             children: [
-              MessageList(),
-              UserList(),
+             // MessageList(),
+             // UserList(),
             ],
           ),
         ),
