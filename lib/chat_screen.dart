@@ -1,6 +1,127 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '/lib/message/LocalStroage.dart';
+
+class ChatScreen extends StatefulWidget {
+  final String chatDocumentId;
+  final String userName;
+  final String userSurname;
+  final String userEmail;
+
+  const ChatScreen({
+    Key? key,
+    required this.chatDocumentId,
+    required this.userName,
+    required this.userSurname,
+    required this.userEmail,
+  }) : super(key: key);
+
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  TextEditingController _messageController = TextEditingController();
+  List<Message> messages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+  }
+
+  Future<void> _loadMessages() async {
+    var loadedMessages = await LocalStorage.loadMessages(widget.chatDocumentId);
+
+    setState(() {
+      messages = loadedMessages.map((msg) {
+        return Message(
+          msg['msg'],
+          msg['from'] == widget.userEmail,
+          msg['from'],
+          msg['to'],
+          DateTime.parse(msg['tarih']),
+        );
+      }).toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat Screen'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                return message.isOwnMessage
+                    ? OwnMessageCard(
+                        message: message.content,
+                        timestamp: message.timestamp.toString(),
+                      )
+                    : ReplyCard(
+                        message: message.content,
+                        timestamp: message.timestamp.toString(),
+                      );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _messageController,
+                    decoration: InputDecoration(
+                      hintText: 'Type your message...',
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    sendMessage(_messageController.text);
+                    _messageController.clear();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> sendMessage(String text) async {
+    try {
+      await LocalStorage.saveMessage(
+        widget.chatDocumentId,
+        text,
+        FirebaseAuth.instance.currentUser?.email ?? '',
+        widget.userEmail,
+      );
+
+      setState(() {
+        messages.add(Message(
+          text,
+          true,
+          FirebaseAuth.instance.currentUser?.email ?? '',
+          widget.userEmail,
+          DateTime.now(),
+        ));
+      });
+    } catch (error) {
+      print("Error sending message: $error");
+    }
+  }
+}
 
 class OwnMessageCard extends StatelessWidget {
   final String message;
@@ -95,152 +216,5 @@ class ReplyCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class Message {
-  final String content;
-  final bool isOwnMessage;
-  final String userName;
-  final String userSurname;
-  final DateTime timestamp;
-
-  Message(
-    this.content,
-    this.isOwnMessage,
-    this.userName,
-    this.userSurname,
-    this.timestamp,
-  );
-}
-
-class ChatScreen extends StatefulWidget {
-  final String chatDocumentId;
-  final String userName;
-  final String userSurname;
-  final String userEmail;
-
-  const ChatScreen({
-    Key? key,
-    required this.chatDocumentId,
-    required this.userName,
-    required this.userSurname,
-    required this.userEmail, required String otherUserEmail, required otherUserName, required otherUserSurname,
-  }) : super(key: key);
-
-  @override
-  _ChatScreenState createState() => _ChatScreenState();
-}
-
-var currentUser = FirebaseAuth.instance.currentUser;
-var myEmail = currentUser?.email;
-
-
-class _ChatScreenState extends State<ChatScreen> {
-  TextEditingController _messageController = TextEditingController();
-  List<Message> messages = [];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat Screen'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('sohbetler/${widget.chatDocumentId}/msg')
-                  .orderBy('tarih')
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                messages.clear();
-
-                for (var doc in snapshot.data!.docs) {
-                  var data = doc.data() as Map<String, dynamic>;
-                  var content = data['msg'] as String;
-                  var from = data['from'] as String;
-                  var to = data['to'] as String;
-                  var timestamp = data['tarih'] != null
-                      ? (data['tarih'] as Timestamp).toDate()
-                      : DateTime.now();
-                  var isOwnMessage = to == widget.userEmail;
-                  messages
-                      .add(Message(content, isOwnMessage, from, to, timestamp));
-                }
-                print(widget.userEmail);
-                return ListView.builder(
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    return message.isOwnMessage
-                        ? OwnMessageCard(
-                            message: message.content,
-                            timestamp: message.timestamp.toString(),
-                          )
-                        : ReplyCard(
-                            message: message.content,
-                            timestamp: message.timestamp.toString(),
-                          );
-                  },
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Mesajınızı yazın...',
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    sendMessage(_messageController.text);
-                    _messageController.clear();
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> sendMessage(String text) async {
-    try {
-      CollectionReference chatCollection =
-          FirebaseFirestore.instance.collection('sohbetler');
-      DocumentReference chatDocumentRef =
-          chatCollection.doc(widget.chatDocumentId);
-      CollectionReference messagesCollection =
-          chatDocumentRef.collection('msg');
-
-      DocumentReference newMessageRef = await messagesCollection.add({
-        'from': myEmail,
-        'to': widget.userEmail,
-        'msg': text,
-        'tarih': FieldValue.serverTimestamp(),
-      });
-
-      print(
-          'Mesaj başarıyla gönderildi Firestore koleksiyonuna. ID: ${newMessageRef.id}');
-    } catch (error) {
-      print("Mesaj gönderme hatası: $error");
-    }
   }
 }

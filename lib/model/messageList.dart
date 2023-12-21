@@ -91,9 +91,7 @@ class MessageList extends StatelessWidget {
                                 userName: user.displayName ?? "",
                                 userSurname: "",
                                 userEmail: otherUserEmail,
-                                otherUserEmail: currentUserEmail ?? "",
-                                otherUserName: otherUserName,
-                                otherUserSurname: otherUserSurname,
+                                otherUserEmail: '',
                               ),
                             ),
                           );
@@ -114,9 +112,7 @@ class MessageList extends StatelessWidget {
                                 userName: user.displayName ?? "",
                                 userSurname: "",
                                 userEmail: currentUserEmail ?? "",
-                                otherUserEmail: otherUserEmail,
-                                otherUserName: otherUserName,
-                                otherUserSurname: otherUserSurname,
+                                otherUserEmail: '',
                               ),
                             ),
                           );
