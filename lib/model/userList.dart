@@ -28,104 +28,109 @@ class UserList extends StatelessWidget {
           if (myEmail != null && userEmail != null && myEmail != userEmail) {
             userList.add(
               InkWell(
-                onTap: () async {
-                  var otherUserEmail = userEmail;
-                  var currentUserEmail =
-                      FirebaseAuth.instance.currentUser?.email;
-                  var chatCollection =
-                      FirebaseFirestore.instance.collection('sohbetler');
+                  onTap: () async {
+                    var otherUserEmail = userEmail;
+                    var currentUserEmail =
+                        FirebaseAuth.instance.currentUser?.email;
+                    var chatCollection =
+                        FirebaseFirestore.instance.collection('sohbetler');
 
-                  var existingChat = await chatCollection
-                      .where('from', isEqualTo: currentUserEmail)
-                      .where('to', isEqualTo: otherUserEmail)
-                      .get();
-
-                  if (existingChat.docs.isEmpty) {
-                    existingChat = await chatCollection
-                        .where('from', isEqualTo: otherUserEmail)
-                        .where('to', isEqualTo: currentUserEmail)
+                    var existingChat = await chatCollection
+                        .where('from', isEqualTo: currentUserEmail)
+                        .where('to', isEqualTo: otherUserEmail)
                         .get();
-                  }
 
-                  if (existingChat.docs.isNotEmpty) {
-                    var chatDocumentId = existingChat.docs.first.id;
+                    if (existingChat.docs.isEmpty) {
+                      existingChat = await chatCollection
+                          .where('from', isEqualTo: otherUserEmail)
+                          .where('to', isEqualTo: currentUserEmail)
+                          .get();
+                    }
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          chatDocumentId: chatDocumentId,
-                          userName: userName,
-                          userSurname: userSurname,
-                          userEmail: userEmail,
-                          otherUserEmail: '',
-                          otherUserName: "",
-                          otherUserSurname: "",
-                        ),
-                      ),
-                    );
-                  } else {
-                    var newChatDocument = await chatCollection.add({
-                      'from': currentUserEmail,
-                      'to': otherUserEmail,
-                      'tarih': Timestamp.now(),
-                    });
+                    if (existingChat.docs.isNotEmpty) {
+                      var chatDocumentId = existingChat.docs.first.id;
 
-                    var chatDocumentId = newChatDocument.id;
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          chatDocumentId: chatDocumentId,
-                          userName: userName,
-                          userSurname: userSurname,
-                          userEmail: userEmail,
-                          otherUserEmail: '',
-                          otherUserName: "",
-                          otherUserSurname: "",
-                        ),
-                      ),
-                    );
-                  }
-                },
-                child: Card(
-                  margin: const EdgeInsets.all(8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '$userEmail',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 5),
-                            /*  Text(
-                            isOnline ? 'Online' : 'Çevrimdışı',
-                              style: TextStyle(
-                                color: isOnline ? Colors.green : Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),*/
-                          ],
-                        ),
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            //color: isOnline ? Colors.green : Colors.grey,
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                            chatDocumentId: chatDocumentId,
+                            userName: userName,
+                            userSurname: userSurname,
+                            userEmail: userEmail,
+                            otherUserEmail: '',
+                            otherUserName: "",
+                            otherUserSurname: "",
                           ),
                         ),
-                      ],
+                      );
+                    } else {
+                      var newChatDocument = await chatCollection.add({
+                        'from': currentUserEmail,
+                        'to': otherUserEmail,
+                        'tarih': Timestamp.now(),
+                      });
+
+                      var chatDocumentId = newChatDocument.id;
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                            chatDocumentId: chatDocumentId,
+                            userName: userName,
+                            userSurname: userSurname,
+                            userEmail: userEmail,
+                            otherUserEmail: '',
+                            otherUserName: "",
+                            otherUserSurname: "",
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.all(8),
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
-                  ),
-                ),
-              ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '$userName $userSurname',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                '$userEmail',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isOnline ? Colors.green : Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )),
             );
           }
         }
@@ -145,3 +150,10 @@ class UserList extends StatelessWidget {
     );
   }
 }
+/*  Text(
+                            isOnline ? 'Online' : 'Çevrimdışı',
+                              style: TextStyle(
+                                color: isOnline ? Colors.green : Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),*/
