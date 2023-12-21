@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app_flutter/chat_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MessageList extends StatelessWidget {
   const MessageList({Key? key}) : super(key: key);
@@ -79,10 +80,8 @@ class MessageList extends StatelessWidget {
                               .where('to', isEqualTo: currentUserEmail)
                               .get();
                         }
-
                         if (existingChat.docs.isNotEmpty) {
                           var chatDocumentId = existingChat.docs.first.id;
-
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -122,11 +121,76 @@ class MessageList extends StatelessWidget {
                           );
                         }
                       },
-                      child: Card(
-                        child: ListTile(
-                          title: Text(otherUserEmail),
-                        ),
-                      ),
+                      //Card Düzenlenecek
+                      child: Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 0.8), // Add top and bottom spacing
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFF285059),
+                                Color.fromARGB(255, 184, 221, 167)
+                              ], // Set your gradient colors
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                            padding: EdgeInsets.all(25), // Increased padding
+                            color:
+                                Colors.white, // Set background color to white
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.grey,
+                                      child: Icon(
+                                        Icons.person,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          otherUserEmail,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize:
+                                                13.0, // Set email text size to 20
+                                          ),
+                                        ),
+                                        Text(
+                                          "Additional Text",
+                                          style: GoogleFonts.lobster(
+                                            color: Colors.black,
+                                            fontSize: 17.0,
+                                            // Set additional text size to 25
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Icon(
+                                  Icons.arrow_forward,
+                                  color: Colors.black,
+                                ),
+                              ],
+                            ),
+                          )),
                     );
                   },
                 );

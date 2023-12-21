@@ -104,13 +104,13 @@ class UserList extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 5),
-                            Text(
-                              isOnline ? 'Online' : 'Çevrimdışı',
+                            /*  Text(
+                            isOnline ? 'Online' : 'Çevrimdışı',
                               style: TextStyle(
                                 color: isOnline ? Colors.green : Colors.grey,
                                 fontWeight: FontWeight.bold,
                               ),
-                            ),
+                            ),*/
                           ],
                         ),
                         Container(
@@ -118,7 +118,7 @@ class UserList extends StatelessWidget {
                           height: 12,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: isOnline ? Colors.green : Colors.grey,
+                            //color: isOnline ? Colors.green : Colors.grey,
                           ),
                         ),
                       ],

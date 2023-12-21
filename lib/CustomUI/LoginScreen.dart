@@ -54,16 +54,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     password: password,
                   );
 
-                  
                   print('Giriş başarılı: ${userCredential.user!.uid}');
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => home(),
+                      builder: (context) => Home(),
                     ),
                   );
                 } catch (e) {
-                  
                   print('Giriş başarısız: $e');
                 }
               },

@@ -1,37 +1,83 @@
+import 'package:chat_app_flutter/model/messageList.dart';
 import 'package:chat_app_flutter/model/userList.dart';
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:chat_app_flutter/model/messageList.dart';
 
-class home extends StatelessWidget {
-  const home({Key? key});
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  int _selectedIndex = 0;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.blueAccent,
-            bottom: const TabBar(
-              tabs: [
-                Tab(icon: Icon(Icons.message_outlined), text: 'Mesajlar'),
-                Tab(
-                  icon: Icon(Icons.supervised_user_circle_outlined),
-                  text: 'Kullanıcılar',
-                ),
-              ],
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
+    return Scaffold(
+      backgroundColor: Color(0xFFF2F2F2),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Center(
+          child: Text(
+            "Projenin Adı",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            title: const Text('TEST'),
-          ),
-          body: TabBarView(
-            children: [
-              MessageList(),
-              UserList(),
-            ],
           ),
         ),
+      ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        children: [
+          Center(
+            child: MessageList(),
+          ),
+          Center(
+            child: UserList(),
+          ),
+        ],
+      ),
+      bottomNavigationBar: CurvedNavigationBar(
+        backgroundColor: Color(0xF2F2F2),
+        color: Color(0xFF285059),
+        animationDuration: Duration(milliseconds: 300),
+        onTap: (index) {
+          _pageController.animateToPage(
+            index,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+        },
+        items: [
+          Icon(
+            Icons.message_outlined,
+            color: Colors.white,
+          ),
+          Icon(
+            Icons.portrait_outlined,
+            color: Colors.white,
+          ),
+        ],
+        index: _selectedIndex,
       ),
     );
   }
