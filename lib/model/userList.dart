@@ -119,14 +119,14 @@ class UserList extends StatelessWidget {
                               ),
                             ],
                           ),
-                          Container(
+                          /*Container(
                             width: 12,
                             height: 12,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: isOnline ? Colors.green : Colors.grey,
                             ),
-                          ),
+                          ),*/
                         ],
                       ),
                     ),

@@ -125,7 +125,10 @@ class ChatScreen extends StatefulWidget {
     required this.chatDocumentId,
     required this.userName,
     required this.userSurname,
-    required this.userEmail, required String otherUserEmail, required otherUserName, required otherUserSurname,
+    required this.userEmail,
+    required String otherUserEmail,
+    required otherUserName,
+    required otherUserSurname,
   }) : super(key: key);
 
   @override
@@ -134,7 +137,6 @@ class ChatScreen extends StatefulWidget {
 
 var currentUser = FirebaseAuth.instance.currentUser;
 var myEmail = currentUser?.email;
-
 
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _messageController = TextEditingController();
@@ -199,19 +201,35 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextFormField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Mesajınızı yazın...',
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TextFormField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        hintText: 'Mesajınızı yazın...',
+                        border: InputBorder.none,
+                      ),
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
+                SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
                     sendMessage(_messageController.text);
                     _messageController.clear();
                   },
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.blue,
+                    child: Icon(
+                      Icons.send,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ],
             ),
