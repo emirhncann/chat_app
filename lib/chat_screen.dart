@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 
 class OwnMessageCard extends StatelessWidget {
   final String message;
-  final String timestamp;
 
-  OwnMessageCard({required this.message, required this.timestamp});
+  OwnMessageCard({required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +31,6 @@ class OwnMessageCard extends StatelessWidget {
                   message,
                   style: const TextStyle(fontSize: 16),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  timestamp,
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
-                ),
               ],
             ),
           ),
@@ -44,11 +42,9 @@ class OwnMessageCard extends StatelessWidget {
 
 class ReplyCard extends StatelessWidget {
   final String message;
-  final String timestamp;
 
   ReplyCard({
     required this.message,
-    required this.timestamp,
   });
 
   @override
@@ -78,18 +74,6 @@ class ReplyCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned(
-                bottom: 4,
-                right: 10,
-                child: Row(
-                  children: [
-                    Text(
-                      timestamp,
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
-                    )
-                  ],
-                ),
-              )
             ],
           ),
         ),
@@ -103,14 +87,12 @@ class Message {
   final bool isOwnMessage;
   final String userName;
   final String userSurname;
-  final DateTime timestamp;
 
   Message(
     this.content,
     this.isOwnMessage,
     this.userName,
     this.userSurname,
-    this.timestamp,
   );
 }
 
@@ -170,12 +152,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   var content = data['msg'] as String;
                   var from = data['from'] as String;
                   var to = data['to'] as String;
-                  var timestamp = data['tarih'] != null
-                      ? (data['tarih'] as Timestamp).toDate()
-                      : DateTime.now();
                   var isOwnMessage = to == widget.userEmail;
-                  messages
-                      .add(Message(content, isOwnMessage, from, to, timestamp));
+                  messages.add(Message(content, isOwnMessage, from, to));
                 }
                 print(widget.userEmail);
                 return ListView.builder(
@@ -183,14 +161,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemBuilder: (context, index) {
                     final message = messages[index];
                     return message.isOwnMessage
-                        ? OwnMessageCard(
-                            message: message.content,
-                            timestamp: message.timestamp.toString(),
-                          )
-                        : ReplyCard(
-                            message: message.content,
-                            timestamp: message.timestamp.toString(),
-                          );
+                        ? OwnMessageCard(message: message.content)
+                        : ReplyCard(message: message.content);
                   },
                 );
               },
@@ -252,13 +224,45 @@ class _ChatScreenState extends State<ChatScreen> {
         'from': myEmail,
         'to': widget.userEmail,
         'msg': text,
-        'tarih': FieldValue.serverTimestamp(),
+        'tarih': DateTime.now().toUtc().toString(),
       });
 
       print(
           'Mesaj başarıyla gönderildi Firestore koleksiyonuna. ID: ${newMessageRef.id}');
+
+      // Gönderilen mesajı JSON dosyasına kaydet
+      await saveMessageToJSON({
+        'from': myEmail,
+        'to': widget.userEmail,
+        'msg': text,
+        'tarih': DateTime.now().toUtc().toString(),
+      });
     } catch (error) {
       print("Mesaj gönderme hatası: $error");
+    }
+  }
+
+  Future<void> saveMessageToJSON(Map<String, dynamic> message) async {
+    try {
+      final directory = await getExternalStorageDirectory();
+      final file = File('${directory!.path}/messages.json');
+
+      // JSON dosyasını oku
+      List<dynamic> messages = [];
+      if (await file.exists()) {
+        final contents = await file.readAsString();
+        messages = json.decode(contents);
+      }
+
+      // Yeni mesajı ekle
+      messages.add(message);
+
+      // JSON dosyasına yaz
+      await file.writeAsString(json.encode(messages));
+      print('Mesaj başarıyla JSON dosyasına kaydedildi.');
+      print('Dosya yolu: ${directory!.path}/messages.json');
+    } catch (error) {
+      print('JSON dosyasına mesajı kaydetme hatası: $error');
     }
   }
 }
