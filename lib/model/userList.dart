@@ -23,7 +23,6 @@ class UserList extends StatelessWidget {
           var userName = userData['name'];
           var userSurname = userData['surname'];
           var userEmail = userData['email'];
-          var isOnline = userData['isOnline'] ?? true;
 
           if (myEmail != null && userEmail != null && myEmail != userEmail) {
             userList.add(
@@ -104,22 +103,7 @@ class UserList extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 5),
-                            Text(
-                              isOnline ? 'Online' : 'Çevrimdışı',
-                              style: TextStyle(
-                                color: isOnline ? Colors.green : Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                           ],
-                        ),
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isOnline ? Colors.green : Colors.grey,
-                          ),
                         ),
                       ],
                     ),
