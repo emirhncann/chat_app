@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-import 'package:intl/intl.dart';
 
 class OwnMessageCard extends StatelessWidget {
   final String message;
@@ -108,21 +106,28 @@ class ChatScreen extends StatefulWidget {
     required this.userName,
     required this.userSurname,
     required this.userEmail,
+    required String otherUserSurname,
     required String otherUserEmail,
-    required otherUserName,
-    required otherUserSurname,
+    required String otherUserName,
   }) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
-var currentUser = FirebaseAuth.instance.currentUser;
-var myEmail = currentUser?.email;
+var currentUser; // This variable is moved to the state
+var myEmail;
 
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _messageController = TextEditingController();
   List<Message> messages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    currentUser = FirebaseAuth.instance.currentUser;
+    myEmail = currentUser?.email;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,38 +138,13 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('sohbetler/${widget.chatDocumentId}/msg')
-                  .orderBy('tarih')
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                messages.clear();
-
-                for (var doc in snapshot.data!.docs) {
-                  var data = doc.data() as Map<String, dynamic>;
-                  var content = data['msg'] as String;
-                  var from = data['from'] as String;
-                  var to = data['to'] as String;
-                  var isOwnMessage = to == widget.userEmail;
-                  messages.add(Message(content, isOwnMessage, from, to));
-                }
-                print(widget.userEmail);
-                return ListView.builder(
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    return message.isOwnMessage
-                        ? OwnMessageCard(message: message.content)
-                        : ReplyCard(message: message.content);
-                  },
-                );
+            child: ListView.builder(
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                return message.isOwnMessage
+                    ? OwnMessageCard(message: message.content)
+                    : ReplyCard(message: message.content);
               },
             ),
           ),
@@ -213,30 +193,23 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> sendMessage(String text) async {
     try {
-      CollectionReference chatCollection =
-          FirebaseFirestore.instance.collection('sohbetler');
-      DocumentReference chatDocumentRef =
-          chatCollection.doc(widget.chatDocumentId);
-      CollectionReference messagesCollection =
-          chatDocumentRef.collection('msg');
-
-      DocumentReference newMessageRef = await messagesCollection.add({
-        'from': myEmail,
-        'to': widget.userEmail,
-        'msg': text,
-        'tarih': DateTime.now().toUtc().toString(),
-      });
-
-      print(
-          'Mesaj başarıyla gönderildi Firestore koleksiyonuna. ID: ${newMessageRef.id}');
-
-      // Gönderilen mesajı JSON dosyasına kaydet
+      // Save the message locally
       await saveMessageToJSON({
-        'from': myEmail,
-        'to': widget.userEmail,
-        'msg': text,
-        'tarih': DateTime.now().toUtc().toString(),
+        'chatid': '123', // Replace '123' with the actual chat ID
+        'message': {
+          'from': myEmail,
+          'to': widget.userEmail,
+          'msg': text,
+          'tarih': DateTime.now().toUtc().toString(),
+        },
       });
+
+      // Update the state to include the new message
+      setState(() {
+        messages.add(Message(text, true, widget.userName, widget.userSurname));
+      });
+
+      print('Mesaj başarıyla JSON dosyasına kaydedildi.');
     } catch (error) {
       print("Mesaj gönderme hatası: $error");
     }
@@ -248,19 +221,19 @@ class _ChatScreenState extends State<ChatScreen> {
       final file = File('${directory!.path}/messages.json');
 
       // JSON dosyasını oku
-      List<dynamic> messages = [];
+      List<dynamic> messagesList = [];
       if (await file.exists()) {
         final contents = await file.readAsString();
-        messages = json.decode(contents);
+        messagesList = json.decode(contents);
       }
 
       // Yeni mesajı ekle
-      messages.add(message);
+      messagesList.add(message);
 
       // JSON dosyasına yaz
-      await file.writeAsString(json.encode(messages));
+      await file.writeAsString(json.encode(messagesList));
       print('Mesaj başarıyla JSON dosyasına kaydedildi.');
-      print('Dosya yolu: ${directory!.path}/messages.json');
+      print('Dosya yolu: ${directory.path}/messages.json');
     } catch (error) {
       print('JSON dosyasına mesajı kaydetme hatası: $error');
     }
