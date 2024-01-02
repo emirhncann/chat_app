@@ -15,6 +15,7 @@ class MessageList extends StatelessWidget {
     final directory = Directory.current;
     final filePath =
         "/storage/emulated/0/Android/data/com.example.chat_app_flutter/files/messages.json";
+
     try {
       final file = File(filePath);
       final jsonString = file.readAsStringSync();
@@ -28,7 +29,7 @@ class MessageList extends StatelessWidget {
       return ListView.builder(
         itemCount: chatMessages.length,
         itemBuilder: (context, index) {
-          String chatid = chatMessages[index]['message']['from'];
+          String chatid = chatMessages[index]['chatid'];
           String from = chatMessages[index]['message']['from'];
           String? to = chatMessages[index]['message']['to'];
           String message = chatMessages[index]['message']['msg'];
@@ -49,6 +50,10 @@ class MessageList extends StatelessWidget {
                     to: to!,
                     message: message!,
                     timestamp: timestamp!,
+                    selectedChatMessages: chatMessages
+                        .where((msg) => msg['chatid'] == chatid)
+                        .toList(),
+                    chatId: '',
                   ),
                 ),
               );

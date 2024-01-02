@@ -1,8 +1,7 @@
-import 'package:chat_app_flutter/chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
+import 'package:chat_app_flutter/chat_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserList extends StatelessWidget {
   @override
@@ -10,110 +9,91 @@ class UserList extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('kullanicilar').snapshots(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const CircularProgressIndicator();
-        }
-
-        var currentUser = FirebaseAuth.instance.currentUser;
-        var myEmail = currentUser?.email;
-
-        List<Widget> userList = [];
-
-        for (var user in snapshot.data!.docs) {
-          var userData = user.data() as Map<String, dynamic>;
-          var userName = userData['name'];
-          var userSurname = userData['surname'];
-          var userEmail = userData['email'];
-          var isOnline = userData['isOnline'] ?? true;
-
-          if (myEmail != null && userEmail != null && myEmail != userEmail) {
-            userList.add(
-              InkWell(
-                onTap: () {
-                  var otherUserEmail = userEmail;
-                  var currentUserEmail =
-                      FirebaseAuth.instance.currentUser?.email;
-
-                  String generateGUID() {
-                    var uuid = Uuid();
-                    return uuid.v4();
-                  }
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        chatDocumentId: generateGUID(),
-                        userName: userName,
-                        userSurname: userSurname,
-                        userEmail: userEmail,
-                        from: '',
-                        to: '',
-                        message: '',
-                        timestamp: '',
-                      ),
-                    ),
-                  );
-                },
-                child: Card(
-                  margin: const EdgeInsets.all(8),
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '$userName $userSurname',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              '$userEmail',
-                              style: TextStyle(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
-        }
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Kullanıcılar'),
-          ),
-          body: ListView.builder(
-            itemCount: userList.length,
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
-              return userList[index];
+              var userData = snapshot.data!.docs[index];
+              return buildUserCard(context, userData);
             },
-          ),
-        );
+          );
+        }
       },
     );
+  }
+
+  Widget buildUserCard(
+      BuildContext context, QueryDocumentSnapshot<Object?> userData) {
+    var username = userData['name'];
+    var email = userData['email'];
+
+    return Card(
+      child: ListTile(
+        title: Text(username),
+        subtitle: Text(email),
+        onTap: () {
+          openChatScreen(context, userData);
+        },
+      ),
+    );
+  }
+
+  void openChatScreen(
+      BuildContext context, QueryDocumentSnapshot<Object?> userData) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user = auth.currentUser;
+
+    if (user != null) {
+      var currentUserEmail = user.email;
+      var selectedUserEmail = userData['email'];
+
+      // Check if a chat already exists between the current user and the selected user
+      bool chatExists = checkIfChatExists(currentUserEmail!, selectedUserEmail);
+
+      if (chatExists) {
+        // Open existing chat
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ChatScreen(chatId: "$currentUserEmail;$selectedUserEmail", selectedChatMessages: const [], timestamp: '.', message: '', to: '', from: '',),
+          ),
+        );
+      } else {
+        // Create a new chat and open it
+        createNewChat(currentUserEmail, selectedUserEmail);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ChatScreen(chatId: "$currentUserEmail;$selectedUserEmail", selectedChatMessages: const [], timestamp: '', message: '', to: '', from: '',),
+          ),
+        );
+      }
+    } else {
+      print("Kullanıcı oturum açmamış.");
+    }
+  }
+
+  bool checkIfChatExists(String user1, String user2) {
+    // Implement logic to check if a chat already exists
+    // You can use Firestore or any other storage mechanism to store chat information
+    // Return true if a chat exists, false otherwise
+    // Example: You can check a collection of chats in Firestore
+    // and see if a document with the given users' emails already exists
+    return false; // Replace with your actual logic
+  }
+
+  void createNewChat(String user1, String user2) {
+    // Implement logic to create a new chat
+    // You can use Firestore or any other storage mechanism to store chat information
+    // Example: You can add a new document to a collection of chats in Firestore
+    // with information about the users involved in the chat
+    // and other necessary details
+    // This is just a placeholder function, replace it with your actual logic
   }
 }
