@@ -38,6 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'surname': _surnameController.text,
         'email': email,
         'phone': _phoneController.text,
+        "isOnline": "",
       });
 
       print('Kullanıcı başarıyla kaydedildi: $userId');

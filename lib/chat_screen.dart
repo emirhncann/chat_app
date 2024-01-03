@@ -3,9 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:uuid/uuid.dart';
 
-// Message class to represent chat messages
 class Message {
   final String content;
   final bool isOwnMessage;
@@ -13,7 +11,7 @@ class Message {
   Message(this.content, this.isOwnMessage);
 }
 
-// Custom widget for own messages
+
 class OwnMessageCard extends StatelessWidget {
   final String message;
 
@@ -48,7 +46,7 @@ class OwnMessageCard extends StatelessWidget {
   }
 }
 
-// Custom widget for other user's messages
+
 class ReplyCard extends StatelessWidget {
   final String message;
 
@@ -91,7 +89,6 @@ class ReplyCard extends StatelessWidget {
   }
 }
 
-// ChatScreen widget
 class ChatScreen extends StatefulWidget {
   final String? chatDocumentId;
   final String? userName;
@@ -109,7 +106,8 @@ class ChatScreen extends StatefulWidget {
     required String timestamp,
     required String message,
     required String to,
-    required String from, required String chatId,
+    required String from,
+    required String chatId,
   }) : super(key: key);
 
   @override
@@ -130,7 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void initializeMessages() {
     setState(() {
-      // Convert selectedChatMessages to Message objects
+  
       messages = widget.selectedChatMessages.map((chatMessage) {
         return Message(
           chatMessage['message']['msg'],
@@ -204,7 +202,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> sendMessage(String text) async {
     try {
-      // Construct a message map
+      
       Map<String, dynamic> message = {
         'chatid': widget.userEmail! + ";" + myEmail,
         'message': {
@@ -215,10 +213,8 @@ class _ChatScreenState extends State<ChatScreen> {
         },
       };
 
-      // Save the message to JSON file
       await saveMessageToJSON(message);
 
-      // Update the state to reflect the new message
       setState(() {
         messages.add(Message(
           text,
@@ -234,21 +230,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> saveMessageToJSON(Map<String, dynamic> message) async {
     try {
-      // Specify the file path
       final filePath = File(
           "/storage/emulated/0/Android/data/com.example.chat_app_flutter/files/messages.json");
 
-      // Read the existing messages from the file
       List<dynamic> messagesList = [];
       if (await filePath.exists()) {
         final contents = await filePath.readAsString();
         messagesList = json.decode(contents);
       }
 
-      // Add the new message to the list
+      // yeni mesaj ekkle
       messagesList.add(message);
 
-      // Write the updated messages list back to the file
+      // json update le
       await filePath.writeAsString(json.encode(messagesList));
 
       print('Message successfully saved to JSON file.');

@@ -51,26 +51,38 @@ class UserList extends StatelessWidget {
       var currentUserEmail = user.email;
       var selectedUserEmail = userData['email'];
 
-      // Check if a chat already exists between the current user and the selected user
-      bool chatExists = checkIfChatExists(currentUserEmail!, selectedUserEmail);
+      bool chatExists =
+          await checkIfChatExists(currentUserEmail!, selectedUserEmail);
 
       if (chatExists) {
-        // Open existing chat
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                ChatScreen(chatId: "$currentUserEmail;$selectedUserEmail", selectedChatMessages: const [], timestamp: '.', message: '', to: '', from: '',),
+            builder: (context) => ChatScreen(
+              chatId: "$currentUserEmail;$selectedUserEmail",
+              selectedChatMessages: const [],
+              timestamp: '',
+              message: '',
+              to: '',
+              from: '',
+              userEmail: selectedUserEmail,
+            ),
           ),
         );
       } else {
-        // Create a new chat and open it
-        createNewChat(currentUserEmail, selectedUserEmail);
+        await createNewChat(currentUserEmail, selectedUserEmail);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                ChatScreen(chatId: "$currentUserEmail;$selectedUserEmail", selectedChatMessages: const [], timestamp: '', message: '', to: '', from: '',),
+            builder: (context) => ChatScreen(
+              chatId: "$currentUserEmail;$selectedUserEmail",
+              selectedChatMessages: const [],
+              timestamp: '',
+              message: '',
+              to: '',
+              from: '',
+              userEmail: selectedUserEmail,
+            ),
           ),
         );
       }
@@ -79,21 +91,22 @@ class UserList extends StatelessWidget {
     }
   }
 
-  bool checkIfChatExists(String user1, String user2) {
-    // Implement logic to check if a chat already exists
-    // You can use Firestore or any other storage mechanism to store chat information
-    // Return true if a chat exists, false otherwise
-    // Example: You can check a collection of chats in Firestore
-    // and see if a document with the given users' emails already exists
-    return false; // Replace with your actual logic
+  Future<bool> checkIfChatExists(String user1, String user2) async {
+    var chatDocument = await FirebaseFirestore.instance
+        .collection('chats')
+        .doc('$user1;$user2')
+        .get();
+    return chatDocument.exists;
   }
 
-  void createNewChat(String user1, String user2) {
-    // Implement logic to create a new chat
-    // You can use Firestore or any other storage mechanism to store chat information
-    // Example: You can add a new document to a collection of chats in Firestore
-    // with information about the users involved in the chat
-    // and other necessary details
-    // This is just a placeholder function, replace it with your actual logic
+  Future<void> createNewChat(String user1, String user2) async {
+    await FirebaseFirestore.instance
+        .collection('chats')
+        .doc('$user1;$user2')
+        .set({
+      'user1': user1,
+      'user2': user2,
+      'created_at': FieldValue.serverTimestamp(),
+    });
   }
 }

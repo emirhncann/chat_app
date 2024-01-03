@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:chat_app_flutter/chat_screen.dart';
@@ -11,7 +12,7 @@ class MessageList extends StatelessWidget {
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
 
-    // Step 1: Read the JSON file
+  
     final directory = Directory.current;
     final filePath =
         "/storage/emulated/0/Android/data/com.example.chat_app_flutter/files/messages.json";
@@ -21,31 +22,40 @@ class MessageList extends StatelessWidget {
       final jsonString = file.readAsStringSync();
       final jsonData = json.decode(jsonString);
 
-      // Step 2: Extract messages from JSON data
       List<Map<String, dynamic>> chatMessages =
           List<Map<String, dynamic>>.from(jsonData);
 
-      // Step 3: Display messages in your Flutter app
+      Set<String> uniqueChatIds = Set<String>();
+
       return ListView.builder(
         itemCount: chatMessages.length,
         itemBuilder: (context, index) {
-          String chatid = chatMessages[index]['chatid'];
-          String from = chatMessages[index]['message']['from'];
-          String? to = chatMessages[index]['message']['to'];
-          String message = chatMessages[index]['message']['msg'];
-          String timestamp = chatMessages[index]['message']['tarih'];
+          int reversedIndex = chatMessages.length - 1 - index;
+          String chatid = chatMessages[reversedIndex]['chatid'];
+          String from = chatMessages[reversedIndex]['message']['from'];
+          String? to = chatMessages[reversedIndex]['message']['to'];
+          String message = chatMessages[reversedIndex]['message']['msg'];
+          String timestamp = chatMessages[reversedIndex]['message']['tarih'];
 
-          // Extract email addresses
+        
           to = to ?? "Sohbet Bulunamadı";
+
+         
+          if (uniqueChatIds.contains(chatid)) {
+            return Container(); 
+          }
+
+         
+          uniqueChatIds.add(chatid);
 
           return GestureDetector(
             onTap: () {
-              // Handle tap, open ChatScreen
+              
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatScreen(
-                    // Pass necessary data to ChatScreen if needed
+                   
                     from: from!,
                     to: to!,
                     message: message!,
@@ -69,7 +79,7 @@ class MessageList extends StatelessWidget {
         },
       );
     } catch (e) {
-      // Handle file reading error
+      // sohbet yoksa
       return Center(
         child: Text("Hemen Sohbet Etmeye Başla."),
       );
