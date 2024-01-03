@@ -1,13 +1,14 @@
 {
   "project_info": {
-    "project_number": "568380153576",
-    "project_id": "chat-app-btbs",
-    "storage_bucket": "chat-app-btbs.appspot.com"
+    "project_number": "42799207797",
+    "firebase_url": "https://chat-app-bsm-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "chat-app-bsm",
+    "storage_bucket": "chat-app-bsm.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:568380153576:android:61342f95b28847f60c335d",
+        "mobilesdk_app_id": "1:42799207797:android:9d63e05d467a6b9588ef3c",
         "android_client_info": {
           "package_name": "com.example.chat_app_flutter"
         }
@@ -15,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAle_QoSIFEJA0dqof9zGXV_6Yld62azAI"
+          "current_key": "AIzaSyACv3VuwF-KcITEKfY5XfHlm9utCbRsVYI"
         }
       ],
       "services": {
