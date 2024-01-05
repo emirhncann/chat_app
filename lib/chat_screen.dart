@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:firebase_database/firebase_database.dart';
 
 class Message {
   final String content;
@@ -10,7 +10,6 @@ class Message {
 
   Message(this.content, this.isOwnMessage);
 }
-
 
 class OwnMessageCard extends StatelessWidget {
   final String message;
@@ -45,7 +44,6 @@ class OwnMessageCard extends StatelessWidget {
     );
   }
 }
-
 
 class ReplyCard extends StatelessWidget {
   final String message;
@@ -128,7 +126,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void initializeMessages() {
     setState(() {
-  
       messages = widget.selectedChatMessages.map((chatMessage) {
         return Message(
           chatMessage['message']['msg'],
@@ -202,8 +199,22 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> sendMessage(String text) async {
     try {
-      
-      Map<String, dynamic> message = {
+      // Firebase Realtime Database'e mesaj gönderme
+      final DatabaseReference chatRef = FirebaseDatabase.instance
+          .reference()
+          .child('sohbetler/${widget.userEmail! + ";" + myEmail}');
+
+      Map<String, dynamic> messageForDatabase = {
+        'from': myEmail,
+        'to': widget.userEmail,
+        'msg': text,
+        'tarih': DateTime.now().toUtc().toString(),
+      };
+
+      await chatRef.push().set(messageForDatabase);
+
+      // Yerel JSON dosyasına mesajı kaydetme
+      Map<String, dynamic> messageForLocalFile = {
         'chatid': widget.userEmail! + ";" + myEmail,
         'message': {
           'from': myEmail,
@@ -213,18 +224,16 @@ class _ChatScreenState extends State<ChatScreen> {
         },
       };
 
-      await saveMessageToJSON(message);
-
+      await saveMessageToJSON(messageForLocalFile);
+      messages.add(Message(text, true));
       setState(() {
-        messages.add(Message(
-          text,
-          true,
-        ));
+        messages.add(Message(text, true));
       });
 
-      print('Message successfully saved to JSON file.');
+      print(
+          'Mesaj başarıyla Firebase Realtime Database\'e ve JSON dosyasına gönderildi.');
     } catch (error) {
-      print("Error sending message: $error");
+      print("Mesaj gönderme hatası: $error");
     }
   }
 
