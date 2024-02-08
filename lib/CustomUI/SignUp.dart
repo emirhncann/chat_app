@@ -1,3 +1,4 @@
+import 'package:chat_app_flutter/CustomUI/LoginScreen.dart';
 import 'package:chat_app_flutter/CustomUI/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -96,6 +97,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           borderRadius: BorderRadius.circular(10))),
                   onPressed: () async {
                     await registerUser();
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => LoginScreen()));
                   },
                   child: Text(
                     'Kayıt Ol',
